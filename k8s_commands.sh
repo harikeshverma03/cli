@@ -66,6 +66,17 @@ then
     RESOURCE_NAME=$(echo $RESOURCE_LIST | awk '{print $1}')
     echo "Running sh command in pod: $RESOURCE_NAME"
     kubectl exec -it $RESOURCE_NAME -- sh
+elif [[ $1 = "bash" ]]
+then
+    if [ -z "$2" ]; then
+        RESOURCE_LIST=$(kubectl get pods -o wide | column -t | fzf --reverse --height 10)
+    else
+        RESOURCE_LIST=$(kubectl get pods -o wide | grep $2 | column -t | fzf --reverse --height 10)
+    fi
+    [ -z "$RESOURCE_LIST" ] && exit 1
+    RESOURCE_NAME=$(echo $RESOURCE_LIST | awk '{print $1}')
+    echo "Running bash command in pod: $RESOURCE_NAME"
+    kubectl exec -it $RESOURCE_NAME -- bash
 elif [[ $1 = "logs" ]]
 then
     if [ -z "$2" ]; then
